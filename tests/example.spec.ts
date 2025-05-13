@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
-
+import * as readline from "node:readline/promises";
+import { stdin as input, stdout as output } from "node:process";
 test("tests rental application inputs, errors, and submission", async ({
   page,
 }) => {
@@ -25,9 +26,16 @@ test("tests rental application inputs, errors, and submission", async ({
   await expect(
     page1.getByText("Enter the code we sent over email to")
   ).toBeVisible();
-  await page1.pause();
-  await page1.waitForEvent("framenavigated");
+
+  // await page1.pause();
+  const rl = readline.createInterface({
+    input,
+    output,
+  });
+  const otp = await rl.question("please enter the otp code:");
+  rl.close();
   expect(page1.getByText("Let's Get Started.")).toBeVisible();
+  await page1.getByRole("textbox", { name: "Enter the code" }).fill(otp);
 
   // page
   //   .getByRole("input", { name: "email" })
